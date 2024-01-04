@@ -1,0 +1,14 @@
+#!/bin/zsh
+cd urbit-docker
+docker build --build-arg TAG=v2.12 --tag urbitwasm:latest
+cd ..
+docker stop $(docker ps|grep httpd|awk '{print $1;}')
+make && sudo make install
+rm -rf /tmp/out-wasi
+mkdir -p /tmp/out-wasi
+c2w urbitwasm:latest /tmp/out-wasi/htdocs/out.wasm
+cp -R ./examples/wasi-browser/* /tmp/out-wasi/ && chmod 755 /tmp/out-wasi/htdocs
+docker run --rm -p 8000:80 \
+    -v "/tmp/out-wasi/htdocs:/usr/local/apache2/htdocs/:ro" \
+    -v "/tmp/out-wasi/xterm-pty.conf:/usr/local/apache2/conf/extra/xterm-pty.conf:ro" \
+    --entrypoint=/bin/sh httpd -c 'echo "Include conf/extra/xterm-pty.conf" >> /usr/local/apache2/conf/httpd.conf && httpd-foreground'

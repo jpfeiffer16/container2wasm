@@ -1,0 +1,14 @@
+#!/bin/zsh
+cd urbit-docker
+docker build --build-arg TAG=v2.12 --tag urbitwasm:latest
+cd ..
+docker stop $(docker ps|grep httpd|awk '{print $1;}')
+make && sudo make install
+rm -rf /tmp/out-wasm
+mkdir -p /tmp/out-wasm
+cp -R ./examples/emscripten/* /tmp/out-wasm/ && chmod 755 /tmp/out-wasm/htdocs
+c2w --to-js urbitwasm:latest /tmp/out-wasm/htdocs/
+docker run --rm -p 8000:80 \
+    -v "/tmp/out-wasm/htdocs:/usr/local/apache2/htdocs/:ro" \
+    -v "/tmp/out-wasm/xterm-pty.conf:/usr/local/apache2/conf/extra/xterm-pty.conf:ro" \
+    --entrypoint=/bin/sh httpd -c 'echo "Include conf/extra/xterm-pty.conf" >> /usr/local/apache2/conf/httpd.conf && httpd-foreground'

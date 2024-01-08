@@ -24,6 +24,7 @@ COPY dl-urbit /
 COPY reset-urbit-code /bin/
 COPY get-urbit-code /bin/
 COPY start-urbit /bin/
+COPY urbit-v2.12.pill /opt/
 RUN chmod +x /bin/start-urbit /bin/get-urbit-code /bin/reset-urbit-code /dl-urbit /bin/click /bin/click-format
 RUN mkdir -p /urbit/binary
 RUN /bin/bash /dl-urbit

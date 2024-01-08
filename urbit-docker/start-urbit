@@ -106,5 +106,5 @@ if [ $devMode == "True" ]; then
     exit 0
 else
     #exec urbit $ttyflag -p $amesPort --http-port $httpPort --loom $loom $dirname
-    exec urbit -F zod --loom 31 --swap --swap-to ./sf
+    exec urbit -B /opt/urbit-v2.12.pill -F zod --loom 29 --urth-loom 26 --swap --swap-to ./sf
 fi
